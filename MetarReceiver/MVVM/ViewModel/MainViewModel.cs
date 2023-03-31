@@ -5,11 +5,14 @@ using System.Windows;
 using System.Threading.Tasks;
 using MetarReceiver.MVVM.Model;
 using System.Text.Json;
+using System.Threading;
 
 namespace MetarReceiver.MVVM.ViewModel
 {
     internal class MainViewModel : ObservableObject
     {
+        private const string FILE_MAME = "MetarFile";
+
         private bool _isReading;
 
         private MemoryFile _memoryFile;
@@ -29,15 +32,24 @@ namespace MetarReceiver.MVVM.ViewModel
         public MainViewModel() 
         {
             _isReading = false;
-            _memoryFile = new MemoryFile("MetarFile");
+            _memoryFile = new MemoryFile(FILE_MAME);
+
+            Thread.Sleep(100);
+
+            try
+            {
+                _memoryFile.OpenNonPersisted();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private async Task ReceivingData() 
         {
             try
             {
-                _memoryFile.OpenNonPersisted();
-
                 while (_isReading)
                 {
                     var data = await _memoryFile.ReadDataAsync();

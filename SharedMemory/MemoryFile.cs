@@ -54,8 +54,8 @@ namespace SharedMemory
 
                             JsonSerializer.Serialize(stream, data);
 
-                            writer.Write('\0');
-
+                            writer.Write('\0');                                //разделяем новые и старые данные, если
+                                                                               //новые не полностью перезаписали старые 
                             stream.Seek(0, SeekOrigin.Begin);
                             writer.Write(false);                               //снимаем флаг занятости
                         }
@@ -75,26 +75,24 @@ namespace SharedMemory
                     using (BinaryReader reader = new BinaryReader(stream))
                     using (BinaryWriter writer = new BinaryWriter(stream))
                     {
-                        bool isMemoryBusy = reader.ReadBoolean();
-
-                        if (isMemoryBusy == false)                                   //если флаг занятости файла не установлен
+                        if (reader.ReadBoolean() == false)                                //если флаг занятости файла не установлен
                         {
-                            Thread.Sleep(100);                                       //ждем некоторое время
+                            Thread.Sleep(100);                                           //ждем некоторое время
 
                             stream.Seek(0, SeekOrigin.Begin);
 
-                            if ((isMemoryBusy = reader.ReadBoolean()) == true)      //если флаг занятости был установлен, выходим из функции
-                                throw new Exception("Memory mapped file is busy.");
+                            if (reader.ReadBoolean() == true)                            //если файл занят
+                                throw new Exception("Memory mapped file is busy now.");
 
                             stream.Seek(0, SeekOrigin.Begin);
-                            writer.Write(true);                                      //устанавливаем флаг занятости файла
+                            writer.Write(true);                                          //устанавливаем флаг занятости файла
 
                             char[] buffer = new char[128];
                             StringBuilder builder = new StringBuilder();
 
                             while (true)
                             {
-                                buffer = reader.ReadChars(128);
+                                buffer = reader.ReadChars(buffer.Length);
                                 builder.Append(buffer);
 
                                 if (buffer[buffer.Length - 1] == '\0')
@@ -104,7 +102,7 @@ namespace SharedMemory
                             data = builder.ToString();
 
                             stream.Seek(0, SeekOrigin.Begin);
-                            writer.Write(false);                                     //снимаем флаг занятости
+                            writer.Write(false);                                       //снимаем флаг занятости
                         }
                     }
                 }

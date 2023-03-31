@@ -16,6 +16,8 @@ namespace MetarEditor.MVVM.ViewModel
 {
     internal class MainViewModel : ObservableObject
     {
+        private const string FILE_MAME = "MetarFile";
+
         private MeteoRecord _metar;
 
         public MeteoRecord Metar
@@ -29,32 +31,6 @@ namespace MetarEditor.MVVM.ViewModel
         }
 
         private MemoryFile _memoryFile;
-
-        private Dictionary<string, string> _metarPatterns = new Dictionary<string, string>
-        {
-            { "Type", "(?<type>METAR|SPECI)" },
-            { "Aerodrome", @"\s+[A-Z][A-Z0-9]{3}" },
-            { "ObservationTime", "(?<day>[0-9]{2})(?<hour>[0-9]{2})(?<min>[0-9]{2})Z" },
-            { "SurfaceWind", "([0-9]{3}|VRB)([0-9]{2,3})G?([0-9]{2,3})?(KT|MPS|KMH)" },
-            { "Visibility", @"(?<vis>(?<dist>(M|P)?\d\d\d\d|////)" +
-                            @"(?<dir>[NSEW][EW]? | NDV)? |" +
-                            @"(?<distu>(M|P)?(\d+|\d\d?/\d\d?|\d+\s+\d/\d))" +
-                            @"(?<units>SM|KM|M|U) | CAVOK )" },
-            { "RunwaysVisualRange", @"(RVRNO|R(?<name>\d\d(RR?|LL?|C)?)/(?<low>(M|P)?(\d\d\d\d|/{4}))" +
-                                    @"(V(?<high>(M|P)?\d\d\d\d))?" + 
-                                    @"(?<unit>FT)?[/NDU]*)" },
-            { "PresentWeather", @"(?<int>(-|\+|VC)*)" + 
-                                @"(?<desc>(MI|PR|BC|DR|BL|SH|TS|FZ)+)?" +
-                                @"(?<prec>(DZ|RA|SN|SG|IC|PL|GR|GS|UP|/)*)" +
-                                @"(?<obsc>BR|FG|FU|VA|DU|SA|HZ|PY)?" + 
-                                @"(?<other>PO|SQ|FC|SS|DS|NSW|/+)?" +
-                                @"(?<int2>[-+])?" },
-            { "Clouds", @"(?<cover>VV|CLR|SKC|SCK|NSC|NCD|BKN|SCT|FEW|[O0]VC|[^/]///[^/])" +
-                        @"(?<height>[\dO]{2,4}|///)?" +
-                        @"(?<cloud>([A-Z][A-Z]+|///))?" },
-            { "TempAndDew", @"(?<temp>(M|-)?\d{1,2}|//|XX|MM)/(?<dewpt>(M|-)?\d{1,2}|//|XX|MM)" },
-            { "Pressure", @"(?<unit>A|Q|QNH)(?<press>[\dO]{3,4}|////)(?<unit2>INS)?" }
-        };
 
         public string InitialMetar { get; }
 
@@ -182,7 +158,7 @@ namespace MetarEditor.MVVM.ViewModel
             //создание файла памяти
             try
             {
-                _memoryFile = new MemoryFile("MetarFile");
+                _memoryFile = new MemoryFile(FILE_MAME);
                 _memoryFile.CreateNonPersisted();
             }
             catch (Exception ex)
@@ -190,17 +166,48 @@ namespace MetarEditor.MVVM.ViewModel
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            //парсинг исходной сводки
-            _metar.Name = Regex.Match(InitialMetar, _metarPatterns["Type"], RegexOptions.Compiled).Value;
-            Aerodrome = Regex.Match(InitialMetar, _metarPatterns["Aerodrome"], RegexOptions.Compiled).Value;
-            ObservationTime = Regex.Match(InitialMetar, _metarPatterns["ObservationTime"], RegexOptions.Compiled).Value;
-            SurfaceWind = Regex.Match(InitialMetar, _metarPatterns["SurfaceWind"], RegexOptions.Compiled).Value;
-            Visibility = Regex.Match(InitialMetar, _metarPatterns["Visibility"], RegexOptions.Compiled).Value;
-            RunwaysVisualRange = String.Join(' ', Regex.Matches(InitialMetar, _metarPatterns["RunwaysVisualRange"], RegexOptions.Compiled).Select(o => o.Value));
-            PresentWeather = Regex.Match(InitialMetar, _metarPatterns["PresentWeather"], RegexOptions.Compiled).Value;
-            Clouds = String.Join(' ', Regex.Matches(InitialMetar, _metarPatterns["Clouds"], RegexOptions.Compiled).Select(o => o.Value));
-            TempAndDew = Regex.Match(InitialMetar, _metarPatterns["TempAndDew"], RegexOptions.Compiled).Value;
-            Pressure = Regex.Match(InitialMetar, _metarPatterns["Pressure"], RegexOptions.Compiled).Value;
+            ParseMetar();
+        }
+
+        //парсинг исходной сводки
+        private void ParseMetar()
+        {
+            Dictionary<string, string> metarPatterns = new Dictionary<string, string>
+            {
+                { "Type", "(?<type>METAR|SPECI)" },
+                { "Aerodrome", @"[^(METAR|SPECI)]([A-Z][A-Z0-9]{3})" },
+                { "ObservationTime", "(?<day>[0-9]{2})(?<hour>[0-9]{2})(?<min>[0-9]{2})Z" },
+                { "SurfaceWind", "([0-9]{3}|VRB)([0-9]{2,3})G?([0-9]{2,3})?(KT|MPS|KMH)" },
+                { "Visibility", @"(?<vis>(?<dist>(M|P)?\d\d\d\d|////)" +
+                                @"(?<dir>[NSEW][EW]? | NDV)? |" +
+                                @"(?<distu>(M|P)?(\d+|\d\d?/\d\d?|\d+\s+\d/\d))" +
+                                @"(?<units>SM|KM|M|U) | CAVOK )" },
+                { "RunwaysVisualRange", @"(RVRNO|R(?<name>\d\d(RR?|LL?|C)?)/(?<low>(M|P)?(\d\d\d\d|/{4}))" +
+                                        @"(V(?<high>(M|P)?\d\d\d\d))?" +
+                                        @"(?<unit>FT)?[/NDU]*)" },
+                { "PresentWeather", @"(?<int>(-|\+|VC)*)" +
+                                    @"(?<desc>(MI|PR|BC|DR|BL|SH|TS|FZ)+)?" +
+                                    @"(?<prec>(DZ|RA|SN|SG|IC|PL|GR|GS|UP|/)*)" +
+                                    @"(?<obsc>BR|FG|FU|VA|DU|SA|HZ|PY)?" +
+                                    @"(?<other>PO|SQ|FC|SS|DS|NSW|/+)?" +
+                                    @"(?<int2>[-+])?" },
+                { "Clouds", @"(?<cover>VV|CLR|SKC|SCK|NSC|NCD|BKN|SCT|FEW|[O0]VC|[^/]///[^/])" +
+                            @"(?<height>[\dO]{2,4}|///)?" +
+                            @"(?<cloud>([A-Z][A-Z]+|///))?" },
+                { "TempAndDew", @"(?<temp>(M|-)?\d{1,2}|//|XX|MM)/(?<dewpt>(M|-)?\d{1,2}|//|XX|MM)" },
+                { "Pressure", @"(?<unit>A|Q|QNH)(?<press>[\dO]{3,4}|////)(?<unit2>INS)?" }
+            };
+
+            _metar.Name = Regex.Match(InitialMetar, metarPatterns["Type"], RegexOptions.Compiled).Value;
+            Aerodrome = Regex.Match(InitialMetar, metarPatterns["Aerodrome"], RegexOptions.Compiled).Value;
+            ObservationTime = Regex.Match(InitialMetar, metarPatterns["ObservationTime"], RegexOptions.Compiled).Value;
+            SurfaceWind = Regex.Match(InitialMetar, metarPatterns["SurfaceWind"], RegexOptions.Compiled).Value;
+            Visibility = Regex.Match(InitialMetar, metarPatterns["Visibility"], RegexOptions.Compiled).Value;
+            RunwaysVisualRange = String.Join(' ', Regex.Matches(InitialMetar, metarPatterns["RunwaysVisualRange"], RegexOptions.Compiled).Select(o => o.Value));
+            PresentWeather = Regex.Match(InitialMetar, metarPatterns["PresentWeather"], RegexOptions.Compiled).Value;
+            Clouds = String.Join(' ', Regex.Matches(InitialMetar, metarPatterns["Clouds"], RegexOptions.Compiled).Select(o => o.Value));
+            TempAndDew = Regex.Match(InitialMetar, metarPatterns["TempAndDew"], RegexOptions.Compiled).Value;
+            Pressure = Regex.Match(InitialMetar, metarPatterns["Pressure"], RegexOptions.Compiled).Value;
         }
 
         public RelayCommand SendCommand
@@ -208,7 +215,7 @@ namespace MetarEditor.MVVM.ViewModel
             get
             {
                 return new RelayCommand(async (obj) =>
-                {                 
+                {     
                     try
                     {
                         await _memoryFile.WriteDataAsync(_metar);
