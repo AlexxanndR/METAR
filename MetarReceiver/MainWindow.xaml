@@ -1,0 +1,46 @@
+﻿<Window x:Class="MetarReceiver.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MetarReceiver"
+        mc:Ignorable="d"
+        Title="MetarReceiver" Height="720" Width="1280">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.9*"/>
+            <RowDefinition Height="0.1*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                BorderBrush="Black" BorderThickness="0 0 0 1"/>
+
+        <TextBlock Grid.Row="0"
+                   Text="{Binding ReceivedMetar}" TextWrapping="Wrap"
+                   FontFamily="Times New Roman" FontWeight="Light" FontSize="30"
+                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+            
+            <Button Content="НАЧАТЬ ЧТЕНИЕ"
+                    Height="Auto" Width="400"
+                    Margin="10 10"
+                    Background="LightGreen"
+                    FontFamily="Times New Roman" FontWeight="Light" FontSize="30"
+                    HorizontalAlignment="Center"
+                    Command="{Binding StartReadingCommand}"/>
+
+            <Button Content="ЗАВЕРШИТЬ ЧТЕНИЕ"
+                    Height="Auto" Width="400"
+                    Margin="10 10"
+                    Background="MistyRose"
+                    FontFamily="Times New Roman" FontWeight="Light" FontSize="30"
+                    HorizontalAlignment="Center"
+                    Command="{Binding EndReadingCommand}"/>
+
+        </StackPanel>
+
+    </Grid>
+</Window>
