@@ -47,9 +47,13 @@ namespace SharedMemory
                     using (BinaryReader reader = new BinaryReader(stream))
                     using (BinaryWriter writer = new BinaryWriter(stream))
                     {
-                        if (reader.ReadBoolean() == false)                     //если флаг занятости файла не установлен
+                        writer.Write(true);                                    //устанавливаем флаг записи в файл 
+
+                        bool isBusy = reader.ReadBoolean();                    //читаем флаг занятости файла (контрольный флаг)
+
+                        if (isBusy == false)                                   //если флаг занятости файла не установлен
                         {
-                            stream.Seek(0, SeekOrigin.Begin);
+                            stream.Seek(1, SeekOrigin.Begin);
                             writer.Write(true);                                //устанавливаем флаг занятости файла
 
                             JsonSerializer.Serialize(stream, data);
@@ -57,7 +61,8 @@ namespace SharedMemory
                             writer.Write('\0');                                //разделяем новые и старые данные, если
                                                                                //новые не полностью перезаписали старые 
                             stream.Seek(0, SeekOrigin.Begin);
-                            writer.Write(false);                               //снимаем флаг занятости
+                            writer.Write(false);                               //снимаем флаг записи
+                            writer.Write(false);                               //снимаем контрольный флаг
                         }
                     }
                 }
@@ -75,17 +80,13 @@ namespace SharedMemory
                     using (BinaryReader reader = new BinaryReader(stream))
                     using (BinaryWriter writer = new BinaryWriter(stream))
                     {
-                        if (reader.ReadBoolean() == false)                                //если флаг занятости файла не установлен
+                        bool isWrite = reader.ReadBoolean();
+                        bool isBusy = reader.ReadBoolean();
+
+                        if (isBusy == false && isWrite == false)                         //если флаги не установлены
                         {
-                            Thread.Sleep(100);                                           //ждем некоторое время
-
-                            stream.Seek(0, SeekOrigin.Begin);
-
-                            if (reader.ReadBoolean() == true)                            //если файл занят
-                                throw new Exception("Memory mapped file is busy now.");
-
-                            stream.Seek(0, SeekOrigin.Begin);
-                            writer.Write(true);                                          //устанавливаем флаг занятости файла
+                            stream.Seek(1, SeekOrigin.Begin);
+                            writer.Write(true);                                          //устанавливаем флаг занятости файла         
 
                             char[] buffer = new char[128];
                             StringBuilder builder = new StringBuilder();
@@ -93,22 +94,23 @@ namespace SharedMemory
                             while (true)
                             {
                                 buffer = reader.ReadChars(buffer.Length);
-                                builder.Append(buffer);
 
-                                if (buffer[buffer.Length - 1] == '\0')
+                                if (buffer[0] == '\0')
                                     break;
+
+                                builder.Append(buffer);
                             }
 
                             data = builder.ToString();
 
-                            stream.Seek(0, SeekOrigin.Begin);
-                            writer.Write(false);                                       //снимаем флаг занятости
+                            stream.Seek(1, SeekOrigin.Begin);
+                            writer.Write(false);                                       //снимаем контрольный флаг
                         }
                     }
                 }
             });
 
-            return data?.Substring(0, data.IndexOf('\0'));
+            return String.IsNullOrWhiteSpace(data) == false ? data.Substring(0, data.IndexOf('\0')) : null;
         }
 
         ~MemoryFile()

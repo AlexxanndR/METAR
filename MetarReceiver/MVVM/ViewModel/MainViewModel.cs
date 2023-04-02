@@ -34,7 +34,7 @@ namespace MetarReceiver.MVVM.ViewModel
             _isReading = false;
             _memoryFile = new MemoryFile(FILE_MAME);
 
-            Thread.Sleep(100);
+            Thread.Sleep(500);
 
             try
             {

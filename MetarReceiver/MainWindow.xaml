@@ -14,11 +14,16 @@
 
         <Border Grid.Row="0"
                 BorderBrush="Black" BorderThickness="0 0 0 1"/>
-
-        <TextBlock Grid.Row="0"
-                   Text="{Binding ReceivedMetar}" TextWrapping="Wrap"
-                   FontFamily="Times New Roman" FontWeight="Light" FontSize="30"
-                   VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        
+        <StackPanel Grid.Row="0"
+                    Orientation="Vertical"
+                    VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="Полученная сводка:"
+                       FontFamily="Times New Roman" FontWeight="Bold" FontSize="30"
+                       HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding ReceivedMetar}" TextWrapping="Wrap"
+                       FontFamily="Times New Roman" FontWeight="Light" FontSize="30"/>
+        </StackPanel>
 
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"

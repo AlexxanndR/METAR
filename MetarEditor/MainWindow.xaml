@@ -158,7 +158,7 @@
         <StackPanel Grid.Row="2"
                     Orientation="Vertical"
                     HorizontalAlignment="Center">
-            <TextBlock Text="Итоговая сводка: "
+            <TextBlock Text="Отредактированная сводка: "
                        FontFamily="Times New Roman" FontWeight="Light" FontSize="28"
                        HorizontalAlignment="Center"/>
 

@@ -175,9 +175,13 @@ namespace MetarEditor.MVVM.ViewModel
             Dictionary<string, string> metarPatterns = new Dictionary<string, string>
             {
                 { "Type", "(?<type>METAR|SPECI)" },
-                { "Aerodrome", @"[^(METAR|SPECI)]([A-Z][A-Z0-9]{3})" },
+                { "Aerodrome", @"\s+([A-Z][A-Z0-9]{3})" },
                 { "ObservationTime", "(?<day>[0-9]{2})(?<hour>[0-9]{2})(?<min>[0-9]{2})Z" },
-                { "SurfaceWind", "([0-9]{3}|VRB)([0-9]{2,3})G?([0-9]{2,3})?(KT|MPS|KMH)" },
+                { "SurfaceWind", @"(?<dir>[\dO]{3}|[0O]|///|MMM|VRB)" + 
+                                 @"(?<speed>P?[\dO]{2,3}|[/M]{2,3})" + 
+                                 @"(G(?<gust>P?(\d{1,3}|[/M]{1,3})))?" +
+                                 @"(?<units>KTS?|LT|K|T|KMH|MPS)?" + 
+                                 @"(\s+(?<varfrom>\d\d\d)V(?<varto>\d\d\d))" },
                 { "Visibility", @"(?<vis>(?<dist>(M|P)?\d\d\d\d|////)" +
                                 @"(?<dir>[NSEW][EW]? | NDV)? |" +
                                 @"(?<distu>(M|P)?(\d+|\d\d?/\d\d?|\d+\s+\d/\d))" +
