@@ -50,7 +50,7 @@
                     Orientation="Vertical"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
             <TextBlock Text="Исходная сводка: "
-                       FontFamily="Times New Roman" FontWeight="Light" FontSize="28"
+                       FontFamily="Times New Roman" FontWeight="Bold" FontSize="28"
                        HorizontalAlignment="Center"/>
             <TextBlock Text="{Binding InitialMetar}"
                        FontFamily="Times New Roman" FontWeight="Light" FontSize="20"
@@ -159,7 +159,7 @@
                     Orientation="Vertical"
                     HorizontalAlignment="Center">
             <TextBlock Text="Отредактированная сводка: "
-                       FontFamily="Times New Roman" FontWeight="Light" FontSize="28"
+                       FontFamily="Times New Roman" FontWeight="Bold" FontSize="28"
                        HorizontalAlignment="Center"/>
 
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
