@@ -20,13 +20,13 @@
 
 # 2 Блок-схемы
 
-![block_diagram](https://user-images.githubusercontent.com/74370361/229351655-1faff200-6d1f-4f58-903e-27ef7869a244.jpg)
+![block_diagram](https://user-images.githubusercontent.com/74370361/229352488-ab583996-50d9-4af0-b7b8-5d860ee74a0b.jpg)
 
 # 3 Иллюстрация результатов работы программы
 
-![metar_editor](https://user-images.githubusercontent.com/74370361/229291531-35428e19-dfb6-4633-b392-4baa2cb146cd.png)
+![metar_editor](https://user-images.githubusercontent.com/74370361/229353396-d7f6eb51-f9f3-48c6-9c25-8a0aea34dd6f.png)
 
-![metar_receiver](https://user-images.githubusercontent.com/74370361/229291567-12e02a04-2db4-45c8-adc7-90fc1045ccfe.png)
+![metar_receiver](https://user-images.githubusercontent.com/74370361/229353414-5fb725a4-175d-46d7-8dae-378bcc56c28f.png)
 
 # 4 Выводы
 
