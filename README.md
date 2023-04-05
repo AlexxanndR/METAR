@@ -25,7 +25,11 @@
 
 # 3 Иллюстрация результатов работы программы
 
+<h2 align="center">Редактирование сводки</h2>
+
 ![metar_editor](https://user-images.githubusercontent.com/74370361/229353396-d7f6eb51-f9f3-48c6-9c25-8a0aea34dd6f.png)
+
+<h2 align="center">Полученная 2-ым приложением отредактированная сводка</h2>
 
 ![metar_receiver](https://user-images.githubusercontent.com/74370361/229353414-5fb725a4-175d-46d7-8dae-378bcc56c28f.png)
 
