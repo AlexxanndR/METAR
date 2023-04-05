@@ -30,6 +30,7 @@ namespace SharedMemory
             {
                 BinaryWriter writer = new BinaryWriter(stream);
                 writer.Write(false);
+                writer.Write(false);
             }
         }
 
@@ -49,7 +50,7 @@ namespace SharedMemory
                     {
                         writer.Write(true);                                    //устанавливаем флаг записи в файл 
 
-                        bool isBusy = reader.ReadBoolean();                    //читаем флаг занятости файла (контрольный флаг)
+                        bool isBusy = reader.ReadBoolean();                    //читаем флаг занятости файла 
 
                         if (isBusy == false)                                   //если флаг занятости файла не установлен
                         {
@@ -104,7 +105,7 @@ namespace SharedMemory
                             data = builder.ToString();
 
                             stream.Seek(1, SeekOrigin.Begin);
-                            writer.Write(false);                                       //снимаем контрольный флаг
+                            writer.Write(false);                                        //снимаем флаг занятости 
                         }
                     }
                 }
